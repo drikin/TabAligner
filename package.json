@@ -1,0 +1,19 @@
+{
+  "name": "TabAligner",
+  "version": "0.0.0",
+  "description": "Automatic Tab aligning extention for Google Chrome",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Extension"
+  ],
+  "author": "Koh Aoki",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-dart2js": "0.0.5",
+    "grunt-contrib-watch": "~0.6.1"
+  }
+}

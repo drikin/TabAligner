@@ -1,0 +1,10 @@
+{
+  "extName":  {
+    "description": "The extension name.",
+    "message": "Tab Aligner"
+  },
+  "extDescription": {
+    "description": "The extension description.",
+    "message": "シンプルだけどパワフルなタブ管理エクステンション"
+  }
+}
