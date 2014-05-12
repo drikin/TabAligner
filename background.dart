@@ -110,12 +110,24 @@ void groupTabs() {
 
       // Create new windows
       newWindows.forEach((tabs) {
-        var firstTab = tabs.removeAt(0);
-        chrome.WindowsCreateParams createData = new chrome.WindowsCreateParams(focused:true, type:"normal", tabId:firstTab.id);
+        //var firstTab = tabs.removeAt(0);
+        chrome.WindowsCreateParams createData = new chrome.WindowsCreateParams(focused:true, type:"normal");
         chrome.windows.create(createData).then((window) {
+          var initTabId = window.tabs[0].id;
           chrome.TabsMoveParams moveProperties = new chrome.TabsMoveParams(index:-1, windowId:window.id);
           List tabIds = tabs.map((t) => t.id).toList();
           chrome.tabs.move(tabIds, moveProperties);
+
+          // Remove first tab which is empty
+          chrome.tabs.remove([initTabId]);
+
+          // Restore pinned status
+          tabs.forEach((tab) {
+            if (tab.pinned) {
+              chrome.TabsUpdateParams q = new chrome.TabsUpdateParams(pinned: true);
+              chrome.tabs.update(q, tab.id);
+            }
+          });
         });;
       });
     }
