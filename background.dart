@@ -85,15 +85,12 @@ void groupTabs() {
   chrome.windows.getAll(q).then((windows) {
     // Gathering all tab informations
     windows.forEach((window) {
-      List<chrome.Tab> tabs = window.tabs;
-      tabs.forEach((tab) {
-        allTabs.add(tab);
-      });
+      allTabs.addAll(window.tabs);
     });
 
     if (allTabs.length > 1) {
       // Generate new window set
-      var newTabs = [];
+      var newWindows = [];
       var singles = [];
       while(allTabs.length > 0) {
         var t = allTabs.removeAt(0);
@@ -104,15 +101,15 @@ void groupTabs() {
             allTabs.remove(tab);
           });
           tabs.insert(0, t);
-          newTabs.add(tabs);
+          newWindows.add(tabs);
         } else {
           singles.add(t);
         }
       }
-      newTabs.add(singles);
+      newWindows.add(singles);
 
       // Create new windows
-      newTabs.forEach((tabs) {
+      newWindows.forEach((tabs) {
         var firstTab = tabs.removeAt(0);
         chrome.WindowsCreateParams createData = new chrome.WindowsCreateParams(focused:true, type:"normal", tabId:firstTab.id);
         chrome.windows.create(createData).then((window) {
