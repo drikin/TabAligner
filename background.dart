@@ -38,6 +38,8 @@ void alignTab(tab, [String from]) {
                 print('detect duplicate');
                 chrome.TabsUpdateParams q = new chrome.TabsUpdateParams(active: true);
                 chrome.tabs.update(q, target.id);
+                chrome.TabsReloadParams r = new chrome.TabsReloadParams(bypassCache: true);
+                chrome.tabs.reload(target.id, r);
                 chrome.tabs.remove(currentTabId);
               }
             }

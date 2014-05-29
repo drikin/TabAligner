@@ -365,13 +365,6 @@ var $$ = {};
         H.throwExpression(P.UnsupportedError$("add"));
       receiver.push(value);
     },
-    removeAt$1: function(receiver, index) {
-      if (index >= receiver.length)
-        throw H.wrapException(P.RangeError$value(index));
-      if (!!receiver.fixed$length)
-        H.throwExpression(P.UnsupportedError$("removeAt"));
-      return receiver.splice(index, 1)[0];
-    },
     remove$1: function(receiver, element) {
       var i;
       if (!!receiver.fixed$length)
@@ -3138,19 +3131,18 @@ var $$ = {};
     }
   }, "call$0", "main$closure", 0, 0, 83],
   alignTab: [function(tab, from) {
-    var t1, frameId, tabId, t2, completer;
+    var t1, currentTabId, t2, completer;
     t1 = J.getInterceptor$asx(tab);
-    frameId = t1.$index(tab, "frameId");
-    tabId = t1.$index(tab, "tabId");
-    if (J.$eq(frameId, 0) && J.$gt$n(tabId, 0)) {
+    currentTabId = t1.$index(tab, "tabId");
+    if (J.$eq(t1.$index(tab, "frameId"), 0) && J.$gt$n(currentTabId, 0)) {
       t1 = $.get$tabs();
       t1.toString;
       t2 = $.get$chrome();
       if (J.$index$asx(t2, "tabs") == null)
         t1._throwNotAvailable$0();
       completer = F.ChromeCompleter$oneArg(G._createTab0$closure());
-      J.$index$asx(t2, "tabs").callMethod$2("get", [tabId, completer._callback]);
-      completer._completer.future.then$1(new S.alignTab_closure(tabId));
+      J.$index$asx(t2, "tabs").callMethod$2("get", [currentTabId, completer._callback]);
+      completer._completer.future.then$1(new S.alignTab_closure(currentTabId));
     }
   }, "call$2", "alignTab$closure", 2, 2, null, 63, 84, 85],
   groupTabs: [function() {
@@ -3180,7 +3172,7 @@ var $$ = {};
     $isFunction: true
   },
   alignTab_closure: {
-    "^": "Closure:89;tabId_0",
+    "^": "Closure:89;currentTabId_0",
     call$1: [function(tab) {
       var windowId, t1, tabIndex, tabUri, q;
       windowId = tab.get$windowId();
@@ -3189,15 +3181,15 @@ var $$ = {};
       tabUri = P.Uri_parse(t1.get$url(tab));
       q = new G.TabsQueryParams(P.JsObject_JsObject(J.$index$asx($.get$context(), "Object"), null));
       q.TabsQueryParams$11$active$currentWindow$highlighted$index$lastFocusedWindow$pinned$status$title$url$windowId$windowType(null, null, null, null, null, null, null, null, null, windowId, null);
-      $.get$tabs().query$1(0, q).then$1(new S.alignTab__closure(this.tabId_0, windowId, tabIndex, tabUri));
+      $.get$tabs().query$1(0, q).then$1(new S.alignTab__closure(this.currentTabId_0, windowId, tabIndex, tabUri));
     }, "call$1", null, 2, 0, null, 84, "call"],
     $isFunction: true
   },
   alignTab__closure: {
-    "^": "Closure:89;tabId_1,windowId_2,tabIndex_3,tabUri_4",
+    "^": "Closure:89;currentTabId_1,windowId_2,tabIndex_3,tabUri_4",
     call$1: [function(tabs) {
       var t1, t2, t3, i, t4, target, t5, targetId, targetIndex, targetUri, rightUri, t6;
-      t1 = this.tabId_1;
+      t1 = this.currentTabId_1;
       t2 = this.tabUri_4;
       t3 = J.getInterceptor$ax(tabs);
       t3.forEach$1(tabs, new S.alignTab___closure(t1, t2));
@@ -3234,29 +3226,26 @@ var $$ = {};
     $isFunction: true
   },
   alignTab___closure: {
-    "^": "Closure:89;tabId_5,tabUri_6",
+    "^": "Closure:89;currentTabId_5,tabUri_6",
     call$1: [function(target) {
-      var t1, t2, q, t3, t4, completer;
+      var t1, t2, q, t3, t4, t5, completer;
       t1 = J.getInterceptor$x(target);
-      t2 = this.tabId_5;
+      t2 = this.currentTabId_5;
       if (!J.$eq(t1.get$id(target), t2))
         if (P.Uri_parse(t1.get$url(target)).$eq(0, this.tabUri_6)) {
           P.print("detect duplicate");
-          q = new G.TabsUpdateParams(P.JsObject_JsObject(J.$index$asx($.get$context(), "Object"), null));
-          q.TabsUpdateParams$5$active$highlighted$openerTabId$pinned$url(true, null, null, null, null);
+          q = G.TabsUpdateParams$(true, null, null, null, null);
           t3 = $.get$tabs();
+          t3.update$2(q, t1.get$id(target));
+          t4 = P.JsObject_JsObject(J.$index$asx($.get$context(), "Object"), null);
+          J.$indexSet$ax(t4, "bypassCache", true);
           t1 = t1.get$id(target);
-          t3.toString;
-          t4 = $.get$chrome();
-          if (J.$index$asx(t4, "tabs") == null)
-            t3._throwNotAvailable$0();
-          completer = F.ChromeCompleter$oneArg(G._createTab0$closure());
-          J.$index$asx(t4, "tabs").callMethod$2("update", [t1, F.jsify(q), completer._callback]);
-          t3.toString;
-          if (J.$index$asx(t4, "tabs") == null)
+          t5 = $.get$chrome();
+          if (J.$index$asx(t5, "tabs") == null)
             t3._throwNotAvailable$0();
           completer = F.ChromeCompleter$noArgs();
-          J.$index$asx(t4, "tabs").callMethod$2("remove", [F.jsify(t2), completer._callback]);
+          J.$index$asx(t5, "tabs").callMethod$2("reload", [t1, F.jsify(new G.TabsReloadParams(t4)), completer._callback]);
+          t3.remove$1(0, t2);
         }
     }, "call$1", null, 2, 0, null, 60, "call"],
     $isFunction: true
@@ -3264,66 +3253,58 @@ var $$ = {};
   groupTabs_closure: {
     "^": "Closure:89;allTabs_0",
     call$1: [function(windows) {
-      var t1, newTabs, singles, t, t2, tabs;
+      var t1, newWindows, singles, t, t2, tabs;
       t1 = this.allTabs_0;
       J.forEach$1$ax(windows, new S.groupTabs__closure(t1));
-      newTabs = [];
-      singles = [];
-      for (; t1.length > 0;) {
-        t = C.JSArray_methods.removeAt$1(t1, 0);
-        t2 = new H.WhereIterable(t1, new S.groupTabs__closure0(P.Uri_parse(J.get$url$x(t))));
-        t2.$builtinTypeInfo = [null];
-        tabs = P.List_List$from(t2, true, H.getRuntimeTypeArgument(t2, "IterableBase", 0));
-        if (tabs.length > 0) {
-          H.IterableMixinWorkaround_forEach(tabs, new S.groupTabs__closure1(t1));
-          tabs.splice(0, 0, t);
-          newTabs.push(tabs);
-        } else
-          singles.push(t);
+      if (t1.length > 1) {
+        newWindows = [];
+        singles = [];
+        for (; t1.length > 0;) {
+          t = t1.splice(0, 1)[0];
+          t2 = new H.WhereIterable(t1, new S.groupTabs__closure0(P.Uri_parse(J.get$url$x(t))));
+          t2.$builtinTypeInfo = [null];
+          tabs = P.List_List$from(t2, true, H.getRuntimeTypeArgument(t2, "IterableBase", 0));
+          if (tabs.length > 0) {
+            H.IterableMixinWorkaround_forEach(tabs, new S.groupTabs__closure1(t1));
+            tabs.splice(0, 0, t);
+            newWindows.push(tabs);
+          } else
+            singles.push(t);
+        }
+        newWindows.push(singles);
+        H.IterableMixinWorkaround_forEach(newWindows, new S.groupTabs__closure2());
       }
-      newTabs.push(singles);
-      H.IterableMixinWorkaround_forEach(newTabs, new S.groupTabs__closure2());
     }, "call$1", null, 2, 0, null, 185, "call"],
     $isFunction: true
   },
   groupTabs__closure: {
     "^": "Closure:89;allTabs_1",
     call$1: [function($window) {
-      var tabs = $window.get$tabs();
-      tabs.toString;
-      H.IterableMixinWorkaround_forEach(tabs, new S.groupTabs___closure0(this.allTabs_1));
+      C.JSArray_methods.addAll$1(this.allTabs_1, $window.get$tabs());
     }, "call$1", null, 2, 0, null, 186, "call"],
     $isFunction: true
   },
-  groupTabs___closure0: {
-    "^": "Closure:89;allTabs_2",
-    call$1: [function(tab) {
-      this.allTabs_2.push(tab);
-    }, "call$1", null, 2, 0, null, 84, "call"],
-    $isFunction: true
-  },
   groupTabs__closure0: {
-    "^": "Closure:89;url_3",
+    "^": "Closure:89;url_2",
     call$1: [function(f) {
-      var t1 = this.url_3;
+      var t1 = this.url_2;
       return J.contains$1$asx(J.get$url$x(f), t1.get$host(t1));
     }, "call$1", null, 2, 0, null, 109, "call"],
     $isFunction: true
   },
   groupTabs__closure1: {
-    "^": "Closure:89;allTabs_4",
+    "^": "Closure:89;allTabs_3",
     call$1: [function(tab) {
-      C.JSArray_methods.remove$1(this.allTabs_4, tab);
+      C.JSArray_methods.remove$1(this.allTabs_3, tab);
     }, "call$1", null, 2, 0, null, 84, "call"],
     $isFunction: true
   },
   groupTabs__closure2: {
     "^": "Closure:89;",
     call$1: [function(tabs) {
-      var t1, createData, t2, completer;
-      t1 = J.get$id$x(J.removeAt$1$ax(tabs, 0));
+      var createData, t1, t2, completer;
       createData = new U.WindowsCreateParams(P.JsObject_JsObject(J.$index$asx($.get$context(), "Object"), null));
-      createData.WindowsCreateParams$9$focused$height$incognito$left$tabId$top$type$url$width(true, null, null, null, t1, null, "normal", null, null);
+      createData.WindowsCreateParams$9$focused$height$incognito$left$tabId$top$type$url$width(true, null, null, null, null, null, "normal", null, null);
       t1 = $.get$windows();
       t1.toString;
       t2 = $.get$chrome();
@@ -3336,12 +3317,21 @@ var $$ = {};
     $isFunction: true
   },
   groupTabs___closure: {
-    "^": "Closure:89;tabs_5",
+    "^": "Closure:89;tabs_4",
     call$1: [function($window) {
-      var moveProperties, tabIds;
+      var t1, initTabId, moveProperties, t2, tabIds, t3;
+      t1 = $window.get$tabs();
+      if (0 >= t1.length)
+        return H.ioore(t1, 0);
+      initTabId = J.get$id$x(t1[0]);
       moveProperties = G.TabsMoveParams$(-1, J.get$id$x($window));
-      tabIds = J.map$1$ax(this.tabs_5, new S.groupTabs____closure()).toList$0(0);
-      $.get$tabs().move$2(tabIds, moveProperties);
+      t1 = this.tabs_4;
+      t2 = J.getInterceptor$ax(t1);
+      tabIds = t2.map$1(t1, new S.groupTabs____closure()).toList$0(0);
+      t3 = $.get$tabs();
+      t3.move$2(tabIds, moveProperties);
+      t3.remove$1(0, [initTabId]);
+      t2.forEach$1(t1, new S.groupTabs____closure0());
     }, "call$1", null, 2, 0, null, 186, "call"],
     $isFunction: true
   },
@@ -3350,6 +3340,17 @@ var $$ = {};
     call$1: [function(t) {
       return J.get$id$x(t);
     }, "call$1", null, 2, 0, null, 71, "call"],
+    $isFunction: true
+  },
+  groupTabs____closure0: {
+    "^": "Closure:89;",
+    call$1: [function(tab) {
+      var q;
+      if (tab.get$pinned() === true) {
+        q = G.TabsUpdateParams$(null, null, null, true, null);
+        $.get$tabs().update$2(q, J.get$id$x(tab));
+      }
+    }, "call$1", null, 2, 0, null, 84, "call"],
     $isFunction: true
   }
 },
@@ -3649,6 +3650,15 @@ var $$ = {};
       J.$index$asx(t1, "tabs").callMethod$2("query", [F.jsify(queryInfo), completer._callback]);
       return completer._completer.future;
     },
+    update$2: function(updateProperties, tabId) {
+      var t1, completer;
+      t1 = $.get$chrome();
+      if (J.$index$asx(t1, "tabs") == null)
+        this._throwNotAvailable$0();
+      completer = F.ChromeCompleter$oneArg(G._createTab0$closure());
+      J.$index$asx(t1, "tabs").callMethod$2("update", [tabId, F.jsify(updateProperties), completer._callback]);
+      return completer._completer.future;
+    },
     move$2: function(tabIds, moveProperties) {
       var t1, completer;
       t1 = $.get$chrome();
@@ -3656,6 +3666,15 @@ var $$ = {};
         this._throwNotAvailable$0();
       completer = F.ChromeCompleter$oneArg(null);
       J.$index$asx(t1, "tabs").callMethod$2("move", [F.jsify(tabIds), F.jsify(moveProperties), completer._callback]);
+      return completer._completer.future;
+    },
+    remove$1: function(_, tabIds) {
+      var t1, completer;
+      t1 = $.get$chrome();
+      if (J.$index$asx(t1, "tabs") == null)
+        this._throwNotAvailable$0();
+      completer = F.ChromeCompleter$noArgs();
+      J.$index$asx(t1, "tabs").callMethod$2("remove", [F.jsify(tabIds), completer._callback]);
       return completer._completer.future;
     },
     _throwNotAvailable$0: function() {
@@ -3731,12 +3750,18 @@ var $$ = {};
     get$windowId: function() {
       return J.$index$asx(this.jsProxy, "windowId");
     },
+    get$pinned: function() {
+      return J.$index$asx(this.jsProxy, "pinned");
+    },
     get$url: function(_) {
       return J.$index$asx(this.jsProxy, "url");
     }
   },
   TabsQueryParams: {
     "^": "ChromeObject;jsProxy",
+    get$pinned: function() {
+      return J.$index$asx(this.jsProxy, "pinned");
+    },
     get$url: function(_) {
       return J.$index$asx(this.jsProxy, "url");
     },
@@ -3756,9 +3781,20 @@ var $$ = {};
     get$url: function(_) {
       return J.$index$asx(this.jsProxy, "url");
     },
+    get$pinned: function() {
+      return J.$index$asx(this.jsProxy, "pinned");
+    },
     TabsUpdateParams$5$active$highlighted$openerTabId$pinned$url: function(active, highlighted, openerTabId, pinned, url) {
-      J.$indexSet$ax(this.jsProxy, "active", active);
-    }
+      if (active != null)
+        J.$indexSet$ax(this.jsProxy, "active", active);
+      if (pinned != null)
+        J.$indexSet$ax(this.jsProxy, "pinned", pinned);
+    },
+    static: {TabsUpdateParams$: function(active, highlighted, openerTabId, pinned, url) {
+        var t1 = new G.TabsUpdateParams(P.JsObject_JsObject(J.$index$asx($.get$context(), "Object"), null));
+        t1.TabsUpdateParams$5$active$highlighted$openerTabId$pinned$url(active, highlighted, openerTabId, pinned, url);
+        return t1;
+      }}
   },
   TabsMoveParams: {
     "^": "ChromeObject;jsProxy",
@@ -3778,6 +3814,9 @@ var $$ = {};
         t1.TabsMoveParams$2$index$windowId(index, windowId);
         return t1;
       }}
+  },
+  TabsReloadParams: {
+    "^": "ChromeObject;jsProxy"
   }
 }],
 ["chrome.webNavigation", "package:chrome/gen/web_navigation.dart", , T, {
@@ -3876,8 +3915,6 @@ var $$ = {};
       return J.$index$asx(this.jsProxy, "url");
     },
     WindowsCreateParams$9$focused$height$incognito$left$tabId$top$type$url$width: function(focused, height, incognito, left, tabId, $top, type, url, width) {
-      if (tabId != null)
-        J.$indexSet$ax(this.jsProxy, "tabId", tabId);
       J.$indexSet$ax(this.jsProxy, "focused", focused);
       J.$indexSet$ax(this.jsProxy, "type", type);
     }
@@ -4247,103 +4284,6 @@ var $$ = {};
     },
     $isEfficientLength: true
   },
-  SubListIterable: {
-    "^": "ListIterable;_iterable,_start,_endOrLength",
-    get$_endIndex: function() {
-      var $length, t1, t2;
-      $length = J.get$length$asx(this._iterable);
-      t1 = this._endOrLength;
-      if (t1 != null) {
-        if (typeof t1 !== "number")
-          return t1.$gt();
-        if (typeof $length !== "number")
-          return H.iae($length);
-        t2 = t1 > $length;
-      } else
-        t2 = true;
-      if (t2)
-        return $length;
-      return t1;
-    },
-    get$_startIndex: function() {
-      var $length, t1;
-      $length = J.get$length$asx(this._iterable);
-      t1 = this._start;
-      if (typeof $length !== "number")
-        return H.iae($length);
-      if (t1 > $length)
-        return $length;
-      return t1;
-    },
-    get$length: function(_) {
-      var $length, t1, t2, t3;
-      $length = J.get$length$asx(this._iterable);
-      t1 = this._start;
-      if (typeof $length !== "number")
-        return H.iae($length);
-      if (t1 >= $length)
-        return 0;
-      t2 = this._endOrLength;
-      if (t2 != null) {
-        if (typeof t2 !== "number")
-          return t2.$ge();
-        t3 = t2 >= $length;
-      } else
-        t3 = true;
-      if (t3)
-        return $length - t1;
-      if (typeof t2 !== "number")
-        return t2.$sub();
-      return t2 - t1;
-    },
-    elementAt$1: function(_, index) {
-      var realIndex = J.$add$ns(this.get$_startIndex(), index);
-      if (J.$lt$n(index, 0) || J.$ge$n(realIndex, this.get$_endIndex()))
-        throw H.wrapException(P.RangeError$range(index, 0, this.get$length(this)));
-      return J.elementAt$1$ax(this._iterable, realIndex);
-    },
-    take$1: function(_, count) {
-      var t1, t2, newEnd;
-      if (J.$lt$n(count, 0))
-        throw H.wrapException(P.RangeError$value(count));
-      t1 = this._endOrLength;
-      t2 = this._start;
-      if (t1 == null) {
-        if (typeof count !== "number")
-          return H.iae(count);
-        return H.SubListIterable$(this._iterable, t2, t2 + count, null);
-      } else {
-        if (typeof count !== "number")
-          return H.iae(count);
-        newEnd = t2 + count;
-        if (typeof t1 !== "number")
-          return t1.$lt();
-        if (t1 < newEnd)
-          return this;
-        return H.SubListIterable$(this._iterable, t2, newEnd, null);
-      }
-    },
-    SubListIterable$3: function(_iterable, _start, _endOrLength, $E) {
-      var t1, t2;
-      t1 = this._start;
-      if (t1 < 0)
-        throw H.wrapException(P.RangeError$value(t1));
-      t2 = this._endOrLength;
-      if (t2 != null) {
-        if (typeof t2 !== "number")
-          return t2.$lt();
-        if (t2 < 0)
-          throw H.wrapException(P.RangeError$value(t2));
-        if (t1 > t2)
-          throw H.wrapException(P.RangeError$range(t1, 0, t2));
-      }
-    },
-    static: {SubListIterable$: function(_iterable, _start, _endOrLength, $E) {
-        var t1 = H.setRuntimeTypeInfo(new H.SubListIterable(_iterable, _start, _endOrLength), [$E]);
-        t1.SubListIterable$3(_iterable, _start, _endOrLength, $E);
-        return t1;
-      }}
-  },
   ListIterator: {
     "^": "Object;_iterable,_length,_index,_current",
     get$current: function() {
@@ -4520,9 +4460,6 @@ var $$ = {};
     },
     add$1: function(receiver, value) {
       throw H.wrapException(P.UnsupportedError$("Cannot add to a fixed-length list"));
-    },
-    removeAt$1: function(receiver, index) {
-      throw H.wrapException(P.UnsupportedError$("Cannot remove from a fixed-length list"));
     }
   },
   Symbol0: {
@@ -7383,35 +7320,6 @@ var $$ = {};
       this.set$length(receiver, J.$add$ns(t1, 1));
       this.$indexSet(receiver, t1, element);
     },
-    setRange$4: function(receiver, start, end, iterable, skipCount) {
-      var t1, $length, t2, i;
-      t1 = this.get$length(receiver);
-      if (typeof t1 !== "number")
-        return H.iae(t1);
-      t1 = start > t1;
-      if (t1)
-        H.throwExpression(P.RangeError$range(start, 0, this.get$length(receiver)));
-      t1 = J.getInterceptor$n(end);
-      if (t1.$lt(end, start) || t1.$gt(end, this.get$length(receiver)))
-        H.throwExpression(P.RangeError$range(end, start, this.get$length(receiver)));
-      $length = t1.$sub(end, start);
-      if (J.$eq($length, 0))
-        return;
-      if (typeof $length !== "number")
-        return H.iae($length);
-      t1 = J.getInterceptor$asx(iterable);
-      t2 = t1.get$length(iterable);
-      if (typeof t2 !== "number")
-        return H.iae(t2);
-      if (skipCount + $length > t2)
-        throw H.wrapException(new P.StateError("Not enough elements"));
-      if (skipCount < start)
-        for (i = $length - 1; i >= 0; --i)
-          this.$indexSet(receiver, start + i, t1.$index(iterable, skipCount + i));
-      else
-        for (i = 0; i < $length; ++i)
-          this.$indexSet(receiver, start + i, t1.$index(iterable, skipCount + i));
-    },
     indexOf$2: function(receiver, element, startIndex) {
       var t1, i;
       t1 = this.get$length(receiver);
@@ -7433,12 +7341,6 @@ var $$ = {};
         ++i;
       }
       return -1;
-    },
-    removeAt$1: function(receiver, index) {
-      var result = this.$index(receiver, index);
-      this.setRange$4(receiver, index, J.$sub$n(this.get$length(receiver), 1), receiver, index + 1);
-      this.set$length(receiver, J.$sub$n(this.get$length(receiver), 1));
-      return result;
     },
     toString$0: function(receiver) {
       var result;
@@ -9239,12 +9141,6 @@ var $$ = {};
     add$1: function(receiver, value) {
       throw H.wrapException(P.UnsupportedError$("Cannot add to immutable List."));
     },
-    removeAt$1: function(receiver, pos) {
-      throw H.wrapException(P.UnsupportedError$("Cannot remove from immutable List."));
-    },
-    setRange$4: function(receiver, start, end, iterable, skipCount) {
-      throw H.wrapException(P.UnsupportedError$("Cannot setRange on immutable List."));
-    },
     $isList: true,
     $asList: null,
     $isEfficientLength: true,
@@ -9472,21 +9368,6 @@ var $$ = {};
   },
   JsArray: {
     "^": "JsObject_ListMixin;_jsObject",
-    _js$_checkIndex$1: function(_, index) {
-      var t1;
-      if (typeof index === "number" && Math.floor(index) === index)
-        if (!(index < 0)) {
-          t1 = P.JsObject.prototype.$index.call(this, this, "length");
-          if (typeof t1 !== "number")
-            return H.iae(t1);
-          t1 = index >= t1;
-        } else
-          t1 = true;
-      else
-        t1 = false;
-      if (t1)
-        throw H.wrapException(P.RangeError$range(index, 0, P.JsObject.prototype.$index.call(this, this, "length")));
-    },
     $index: function(_, index) {
       var t1;
       if (typeof index === "number" && index === C.JSNumber_methods.toInt$0(index)) {
@@ -9531,30 +9412,6 @@ var $$ = {};
     },
     add$1: function(_, value) {
       this.callMethod$2("push", [value]);
-    },
-    removeAt$1: function(_, index) {
-      this._js$_checkIndex$1(0, index);
-      return J.$index$asx(this.callMethod$2("splice", [index, 1]), 0);
-    },
-    setRange$4: function(_, start, end, iterable, skipCount) {
-      var t1, $length, args;
-      t1 = P.JsObject.prototype.$index.call(this, this, "length");
-      if (typeof t1 !== "number")
-        return H.iae(t1);
-      t1 = start > t1;
-      if (t1)
-        H.throwExpression(P.RangeError$range(start, 0, P.JsObject.prototype.$index.call(this, this, "length")));
-      t1 = J.getInterceptor$n(end);
-      if (t1.$lt(end, start) || t1.$gt(end, P.JsObject.prototype.$index.call(this, this, "length")))
-        H.throwExpression(P.RangeError$range(end, start, P.JsObject.prototype.$index.call(this, this, "length")));
-      $length = t1.$sub(end, start);
-      if (J.$eq($length, 0))
-        return;
-      args = [start, $length];
-      t1 = new H.SubListIterable(iterable, skipCount, null);
-      t1.$builtinTypeInfo = [null];
-      C.JSArray_methods.addAll$1(args, t1.take$1(0, $length));
-      this.callMethod$2("splice", args);
     }
   },
   JsObject_ListMixin: {
@@ -9613,10 +9470,6 @@ var $$ = {};
         throw H.wrapException(P.RangeError$range(index, 0, $length));
       else
         throw H.wrapException(new P.ArgumentError("Invalid list index " + H.S(index)));
-    },
-    _checkIndex$2: function(receiver, index, $length) {
-      if (index >>> 0 !== index || index >= $length)
-        this._invalidIndex$2(receiver, index, $length);
     },
     $isTypedData: true,
     "%": ";ArrayBufferView;NativeTypedArray|NativeTypedArray_ListMixin|NativeTypedArray_ListMixin_FixedLengthListMixin|NativeTypedArrayOfDouble|NativeTypedArray_ListMixin0|NativeTypedArray_ListMixin_FixedLengthListMixin0|NativeTypedArrayOfInt"
@@ -9871,35 +9724,10 @@ var $$ = {};
     get$length: function(receiver) {
       return receiver.length;
     },
-    _setRangeFast$4: function(receiver, start, end, source, skipCount) {
-      var t1, count, sourceLength;
-      t1 = receiver.length + 1;
-      this._checkIndex$2(receiver, start, t1);
-      this._checkIndex$2(receiver, end, t1);
-      if (typeof end !== "number")
-        return H.iae(end);
-      if (start > end)
-        throw H.wrapException(P.RangeError$range(start, 0, end));
-      count = end - start;
-      sourceLength = source.length;
-      if (sourceLength - skipCount < count)
-        throw H.wrapException(new P.StateError("Not enough elements"));
-      if (skipCount !== 0 || sourceLength !== count)
-        source = source.subarray(skipCount, skipCount + count);
-      receiver.set(source, start);
-    },
     $isJavaScriptIndexingBehavior: true
   },
   NativeTypedArrayOfDouble: {
     "^": "NativeTypedArray_ListMixin_FixedLengthListMixin;",
-    setRange$4: function(receiver, start, end, iterable, skipCount) {
-      if (!!J.getInterceptor(iterable).$isNativeTypedArrayOfDouble) {
-        this._setRangeFast$4(receiver, start, end, iterable, skipCount);
-        return;
-      }
-      P.ListMixin.prototype.setRange$4.call(this, receiver, start, end, iterable, skipCount);
-    },
-    $isNativeTypedArrayOfDouble: true,
     $isList: true,
     $asList: function() {
       return [J.JSDouble];
@@ -9927,14 +9755,6 @@ var $$ = {};
   },
   NativeTypedArrayOfInt: {
     "^": "NativeTypedArray_ListMixin_FixedLengthListMixin0;",
-    setRange$4: function(receiver, start, end, iterable, skipCount) {
-      if (!!J.getInterceptor(iterable).$isNativeTypedArrayOfInt) {
-        this._setRangeFast$4(receiver, start, end, iterable, skipCount);
-        return;
-      }
-      P.ListMixin.prototype.setRange$4.call(this, receiver, start, end, iterable, skipCount);
-    },
-    $isNativeTypedArrayOfInt: true,
     $isList: true,
     $asList: function() {
       return [J.JSInt];
@@ -10157,11 +9977,6 @@ J.$eq = function(receiver, a0) {
     return a0 != null && receiver === a0;
   return J.getInterceptor(receiver).$eq(receiver, a0);
 };
-J.$ge$n = function(receiver, a0) {
-  if (typeof receiver == "number" && typeof a0 == "number")
-    return receiver >= a0;
-  return J.getInterceptor$n(receiver).$ge(receiver, a0);
-};
 J.$gt$n = function(receiver, a0) {
   if (typeof receiver == "number" && typeof a0 == "number")
     return receiver > a0;
@@ -10251,9 +10066,6 @@ J.noSuchMethod$1 = function(receiver, a0) {
 };
 J.remove$1$ax = function(receiver, a0) {
   return J.getInterceptor$ax(receiver).remove$1(receiver, a0);
-};
-J.removeAt$1$ax = function(receiver, a0) {
-  return J.getInterceptor$ax(receiver).removeAt$1(receiver, a0);
 };
 J.send$1$x = function(receiver, a0) {
   return J.getInterceptor$x(receiver).send$1(receiver, a0);
@@ -14278,8 +14090,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   main_closure1.prototype = $desc;
-  function alignTab_closure(tabId_0) {
-    this.tabId_0 = tabId_0;
+  function alignTab_closure(currentTabId_0) {
+    this.currentTabId_0 = currentTabId_0;
   }
   alignTab_closure.builtin$cls = "alignTab_closure";
   if (!"name" in alignTab_closure)
@@ -14288,8 +14100,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   alignTab_closure.prototype = $desc;
-  function alignTab__closure(tabId_1, windowId_2, tabIndex_3, tabUri_4) {
-    this.tabId_1 = tabId_1;
+  function alignTab__closure(currentTabId_1, windowId_2, tabIndex_3, tabUri_4) {
+    this.currentTabId_1 = currentTabId_1;
     this.windowId_2 = windowId_2;
     this.tabIndex_3 = tabIndex_3;
     this.tabUri_4 = tabUri_4;
@@ -14301,8 +14113,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   alignTab__closure.prototype = $desc;
-  function alignTab___closure(tabId_5, tabUri_6) {
-    this.tabId_5 = tabId_5;
+  function alignTab___closure(currentTabId_5, tabUri_6) {
+    this.currentTabId_5 = currentTabId_5;
     this.tabUri_6 = tabUri_6;
   }
   alignTab___closure.builtin$cls = "alignTab___closure";
@@ -14332,18 +14144,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   groupTabs__closure.prototype = $desc;
-  function groupTabs___closure0(allTabs_2) {
-    this.allTabs_2 = allTabs_2;
-  }
-  groupTabs___closure0.builtin$cls = "groupTabs___closure0";
-  if (!"name" in groupTabs___closure0)
-    groupTabs___closure0.name = "groupTabs___closure0";
-  $desc = $collectedClasses.groupTabs___closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  groupTabs___closure0.prototype = $desc;
-  function groupTabs__closure0(url_3) {
-    this.url_3 = url_3;
+  function groupTabs__closure0(url_2) {
+    this.url_2 = url_2;
   }
   groupTabs__closure0.builtin$cls = "groupTabs__closure0";
   if (!"name" in groupTabs__closure0)
@@ -14352,8 +14154,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   groupTabs__closure0.prototype = $desc;
-  function groupTabs__closure1(allTabs_4) {
-    this.allTabs_4 = allTabs_4;
+  function groupTabs__closure1(allTabs_3) {
+    this.allTabs_3 = allTabs_3;
   }
   groupTabs__closure1.builtin$cls = "groupTabs__closure1";
   if (!"name" in groupTabs__closure1)
@@ -14371,8 +14173,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   groupTabs__closure2.prototype = $desc;
-  function groupTabs___closure(tabs_5) {
-    this.tabs_5 = tabs_5;
+  function groupTabs___closure(tabs_4) {
+    this.tabs_4 = tabs_4;
   }
   groupTabs___closure.builtin$cls = "groupTabs___closure";
   if (!"name" in groupTabs___closure)
@@ -14390,6 +14192,15 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   groupTabs____closure.prototype = $desc;
+  function groupTabs____closure0() {
+  }
+  groupTabs____closure0.builtin$cls = "groupTabs____closure0";
+  if (!"name" in groupTabs____closure0)
+    groupTabs____closure0.name = "groupTabs____closure0";
+  $desc = $collectedClasses.groupTabs____closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  groupTabs____closure0.prototype = $desc;
   function ChromeBrowserAction(_onClicked) {
     this._onClicked = _onClicked;
   }
@@ -14679,6 +14490,16 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   TabsMoveParams.prototype = $desc;
+  function TabsReloadParams(jsProxy) {
+    this.jsProxy = jsProxy;
+  }
+  TabsReloadParams.builtin$cls = "TabsReloadParams";
+  if (!"name" in TabsReloadParams)
+    TabsReloadParams.name = "TabsReloadParams";
+  $desc = $collectedClasses.TabsReloadParams;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  TabsReloadParams.prototype = $desc;
   function ChromeWebNavigation(_onBeforeNavigate, _onCommitted, _onDOMContentLoaded, _onCompleted, _onErrorOccurred, _onCreatedNavigationTarget, _onReferenceFragmentUpdated, _onTabReplaced, _onHistoryStateUpdated) {
     this._onBeforeNavigate = _onBeforeNavigate;
     this._onCommitted = _onCommitted;
@@ -14777,18 +14598,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   ListIterable.prototype = $desc;
-  function SubListIterable(_iterable, _start, _endOrLength) {
-    this._iterable = _iterable;
-    this._start = _start;
-    this._endOrLength = _endOrLength;
-  }
-  SubListIterable.builtin$cls = "SubListIterable";
-  if (!"name" in SubListIterable)
-    SubListIterable.name = "SubListIterable";
-  $desc = $collectedClasses.SubListIterable;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SubListIterable.prototype = $desc;
   function ListIterator(_iterable, _length, _index, _current) {
     this._iterable = _iterable;
     this._length = _length;
@@ -16824,5 +16633,5 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   NativeTypedArray_ListMixin_FixedLengthListMixin0.prototype = $desc;
-  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, IFrameElement, ImageData, ImageElement, InputElement, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiInput, MidiMessageEvent, MidiOutput, MidiPort, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument, _Attr, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _Notation, _XMLHttpRequestProgressEvent, KeyRange, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedNumberList, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_closure, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, JSInvocationMirror, ReflectionInfo, ReflectionInfo_sortedIndex_closure, Primitives_functionNoSuchMethod_closure, Primitives_applyFunction_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, initHooks_closure, initHooks_closure0, initHooks_closure1, main_closure, main_closure0, main_closure1, alignTab_closure, alignTab__closure, alignTab___closure, groupTabs_closure, groupTabs__closure, groupTabs___closure0, groupTabs__closure0, groupTabs__closure1, groupTabs__closure2, groupTabs___closure, groupTabs____closure, ChromeBrowserAction, ChromeBrowserAction$__closure, ChromeCompleter, ChromeCompleter$noArgs_closure, ChromeCompleter$oneArg_closure, ChromeStreamController, ChromeStreamController$oneArg_closure, ChromeStreamController$twoArgs_closure, ChromeStreamController$threeArgs_closure, ChromeObject, ChromeApi, ChromeTabs, ChromeTabs$__closure, ChromeTabs_query_closure, OnUpdatedEvent, TabsOnMovedEvent, OnSelectionChangedEvent, OnActiveChangedEvent, OnDetachedEvent, OnAttachedEvent, TabsOnRemovedEvent, OnReplacedEvent, Tab, TabsQueryParams, TabsUpdateParams, TabsMoveParams, ChromeWebNavigation, ChromeWebNavigation$__closure, ChromeWindows, ChromeWindows$__closure, ChromeWindows_getAll_closure, Window0, WindowsGetAllParams, WindowsCreateParams, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, WhereIterable, WhereIterator, ExpandIterable, ExpandIterator, EmptyIterator, FixedLengthListMixin, Symbol0, _AsyncError, _BroadcastStream, _BroadcastSubscription, _BroadcastStreamController, _SyncBroadcastStreamController, _SyncBroadcastStreamController__sendData_closure, _SyncBroadcastStreamController__sendError_closure, _AsyncBroadcastStreamController, Future, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_contains_closure, Stream_contains__closure, Stream_contains__closure0, Stream_contains_closure0, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_toList_closure, Stream_toList_closure0, Stream_last_closure, Stream_last_closure0, StreamSubscription, _ControllerStream, _ControllerSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendError_sendError, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedError, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _ForwardingStream, _ForwardingStreamSubscription, _MapStream, _BaseZone, _BaseZone_bindCallback_closure, _BaseZone_bindCallback_closure0, _rootHandleUncaughtError_closure, _rootHandleUncaughtError__closure, _RootZone, _HashMap, _HashMap_values_closure, _IdentityHashMap, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _HashSet, _IdentityHashSet, HashSetIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, _convertJsonToDart_closure, _convertJsonToDart_walk, Codec, Converter, Encoding, JsonCodec, JsonDecoder, Utf8Codec, Utf8Encoder, _Utf8Encoder, Function__toMangledNames_closure, NoSuchMethodError_toString_closure, Comparable, DateTime, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, NoSuchMethodError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Iterator, Map, Null, Object, StackTrace, StringBuffer, Symbol, Uri, Uri_parse_isRegName, Uri_parse_ipV6Address, Uri__makeScheme_isSchemeLowerCharacter, Uri__makePath_closure, Uri__makeQuery_closure, Uri__normalize_isNormalizedHexDigit, Uri__normalize_isLowerCaseHexDigit, Uri__normalize_isUnreserved, Uri__normalize_normalizeHexDigit, Uri__normalize_decodeHexDigitPair, Uri__normalize_fillResult, Uri_hashCode_combine, Uri_parseIPv4Address_error, Uri_parseIPv4Address_closure, Uri_parseIPv6Address_error, Uri_parseIPv6Address_parseHex, Uri_parseIPv6Address_closure, Uri__uriEncode_byteToHex, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, ImmutableListMixin, FixedSizeListIterator, Capability, JsObject, JsObject__convertDataTree__convert, JsFunction, JsArray, JsObject_ListMixin, _convertToJS_closure, _convertToJS_closure0, _wrapToDart_closure, _wrapToDart_closure0, _wrapToDart_closure1, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0];
+  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, IFrameElement, ImageData, ImageElement, InputElement, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiInput, MidiMessageEvent, MidiOutput, MidiPort, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument, _Attr, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _Notation, _XMLHttpRequestProgressEvent, KeyRange, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedNumberList, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_closure, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, JSInvocationMirror, ReflectionInfo, ReflectionInfo_sortedIndex_closure, Primitives_functionNoSuchMethod_closure, Primitives_applyFunction_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, initHooks_closure, initHooks_closure0, initHooks_closure1, main_closure, main_closure0, main_closure1, alignTab_closure, alignTab__closure, alignTab___closure, groupTabs_closure, groupTabs__closure, groupTabs__closure0, groupTabs__closure1, groupTabs__closure2, groupTabs___closure, groupTabs____closure, groupTabs____closure0, ChromeBrowserAction, ChromeBrowserAction$__closure, ChromeCompleter, ChromeCompleter$noArgs_closure, ChromeCompleter$oneArg_closure, ChromeStreamController, ChromeStreamController$oneArg_closure, ChromeStreamController$twoArgs_closure, ChromeStreamController$threeArgs_closure, ChromeObject, ChromeApi, ChromeTabs, ChromeTabs$__closure, ChromeTabs_query_closure, OnUpdatedEvent, TabsOnMovedEvent, OnSelectionChangedEvent, OnActiveChangedEvent, OnDetachedEvent, OnAttachedEvent, TabsOnRemovedEvent, OnReplacedEvent, Tab, TabsQueryParams, TabsUpdateParams, TabsMoveParams, TabsReloadParams, ChromeWebNavigation, ChromeWebNavigation$__closure, ChromeWindows, ChromeWindows$__closure, ChromeWindows_getAll_closure, Window0, WindowsGetAllParams, WindowsCreateParams, ListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, WhereIterable, WhereIterator, ExpandIterable, ExpandIterator, EmptyIterator, FixedLengthListMixin, Symbol0, _AsyncError, _BroadcastStream, _BroadcastSubscription, _BroadcastStreamController, _SyncBroadcastStreamController, _SyncBroadcastStreamController__sendData_closure, _SyncBroadcastStreamController__sendError_closure, _AsyncBroadcastStreamController, Future, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_contains_closure, Stream_contains__closure, Stream_contains__closure0, Stream_contains_closure0, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_toList_closure, Stream_toList_closure0, Stream_last_closure, Stream_last_closure0, StreamSubscription, _ControllerStream, _ControllerSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendError_sendError, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedError, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _ForwardingStream, _ForwardingStreamSubscription, _MapStream, _BaseZone, _BaseZone_bindCallback_closure, _BaseZone_bindCallback_closure0, _rootHandleUncaughtError_closure, _rootHandleUncaughtError__closure, _RootZone, _HashMap, _HashMap_values_closure, _IdentityHashMap, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _HashSet, _IdentityHashSet, HashSetIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, _convertJsonToDart_closure, _convertJsonToDart_walk, Codec, Converter, Encoding, JsonCodec, JsonDecoder, Utf8Codec, Utf8Encoder, _Utf8Encoder, Function__toMangledNames_closure, NoSuchMethodError_toString_closure, Comparable, DateTime, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, NoSuchMethodError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Iterator, Map, Null, Object, StackTrace, StringBuffer, Symbol, Uri, Uri_parse_isRegName, Uri_parse_ipV6Address, Uri__makeScheme_isSchemeLowerCharacter, Uri__makePath_closure, Uri__makeQuery_closure, Uri__normalize_isNormalizedHexDigit, Uri__normalize_isLowerCaseHexDigit, Uri__normalize_isUnreserved, Uri__normalize_normalizeHexDigit, Uri__normalize_decodeHexDigitPair, Uri__normalize_fillResult, Uri_hashCode_combine, Uri_parseIPv4Address_error, Uri_parseIPv4Address_closure, Uri_parseIPv6Address_error, Uri_parseIPv6Address_parseHex, Uri_parseIPv6Address_closure, Uri__uriEncode_byteToHex, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, ImmutableListMixin, FixedSizeListIterator, Capability, JsObject, JsObject__convertDataTree__convert, JsFunction, JsArray, JsObject_ListMixin, _convertToJS_closure, _convertToJS_closure0, _wrapToDart_closure, _wrapToDart_closure0, _wrapToDart_closure1, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0];
 }
